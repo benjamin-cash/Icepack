@@ -306,7 +306,7 @@
       do n = 1, ncat-1
 
          if (hicen_init(n)   > puny .and. &
-             hicen_init(n+1)  > puny ) then
+             hicen_init(n+1) > puny) then
              ! interpolate between adjacent category growth rates
              denom = max(puny,hicen_init(n+1) - hicen_init(n))
              slope = (dhicen(n+1) - dhicen(n)) / denom
