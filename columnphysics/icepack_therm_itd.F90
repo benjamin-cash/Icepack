@@ -145,7 +145,7 @@
 
       real (kind=dbl_kind) :: &
          slope        , & ! rate of change of dhice with hice
-         denom        , & ! denominator for computing slope in hbnew calculation
+         denom        , & ! denominator in hbnew calculation
          dh0          , & ! change in ice thickness at h = 0
          da0          , & ! area melting from category 1
          damax        , & ! max allowed reduction in category 1 area
