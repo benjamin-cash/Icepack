@@ -318,8 +318,8 @@
 
               write(warnstr,*) subname, &
                  'ITD Thermodynamics: hicen_init(n+1) <= hicen_init(n)'
-              call icepack_warnings_setabort(.true.)
               call icepack_warnings_add(warnstr)
+              call icepack_warnings_setabort(.false.)
 
             endif
 
