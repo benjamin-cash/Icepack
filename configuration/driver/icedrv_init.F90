@@ -62,6 +62,7 @@
       use icedrv_calendar, only: year_init, istep0
       use icedrv_calendar, only: dumpfreq, diagfreq, dump_last
       use icedrv_calendar, only: npt, dt, ndtd, days_per_year, use_leap_years
+      use icedrv_history, only: history_cdf
       use icedrv_restart_shared, only: restart, restart_dir, restart_file
       use icedrv_flux, only: update_ocn_f, l_mpond_fresh, cpl_bgc
       use icedrv_flux, only: default_season
@@ -129,7 +130,7 @@
         dt,             npt,            ndtd,            dump_last,     &
         ice_ic,         restart,        restart_dir,     restart_file,  &
         dumpfreq,       diagfreq,       diag_file,       cpl_bgc,       &
-        conserv_check
+        conserv_check,  history_cdf
 
       namelist /grid_nml/ &
         kcatbound
@@ -248,6 +249,7 @@
       restart = .false.      ! if true, read restart files for initialization
       restart_dir  = './'    ! write to executable dir for default
       restart_file = 'iced'  ! restart file name prefix
+      history_cdf = .false.  ! history netcdf file flag
       ice_ic       = 'default'      ! initial conditions are specified in the code
                                     ! otherwise, the filename for reading restarts
       ndtd = 1               ! dynamic time steps per thermodynamic time step
@@ -292,55 +294,111 @@
 
       open (nu_nml, file=nml_filename, status='old',iostat=nml_error)
       if (nml_error /= 0) then
-         nml_error = -1
-      else
-         nml_error =  1
+         write(ice_stdout,*) 'error opening namelist file '//trim(nml_filename)
+         call icedrv_system_abort(file=__FILE__,line=__LINE__)
       endif
+      close(nu_nml)
       
+      print*,'Reading namelist file   ',nml_filename
+
+      open (nu_nml, file=nml_filename, status='old',iostat=nml_error)
+      nml_error =  1
+      print*,'Reading setup_nml'
       do while (nml_error > 0)
-         print*,'Reading namelist file   ',nml_filename
-
-         print*,'Reading setup_nml'
          read(nu_nml, nml=setup_nml,iostat=nml_error)
-         if (nml_error /= 0) exit
-
-         print*,'Reading grid_nml'
-         read(nu_nml, nml=grid_nml,iostat=nml_error)
-         if (nml_error /= 0) exit
-
-         print*,'Reading tracer_nml'
-         read(nu_nml, nml=tracer_nml,iostat=nml_error)
-         if (nml_error /= 0) exit
-
-         print*,'Reading thermo_nml'
-         read(nu_nml, nml=thermo_nml,iostat=nml_error)
-         if (nml_error /= 0) exit
-
-         print*,'Reading shortwave_nml'
-         read(nu_nml, nml=shortwave_nml,iostat=nml_error)
-         if (nml_error /= 0) exit
-
-         print*,'Reading ponds_nml'
-         read(nu_nml, nml=ponds_nml,iostat=nml_error)
-         if (nml_error /= 0) exit
-
-         if (tr_snow) then
-            print*,'Reading snow_nml'
-            read(nu_nml, nml=snow_nml,iostat=nml_error)
-            if (nml_error /= 0) exit
-         endif
-
-         print*,'Reading forcing_nml'
-         read(nu_nml, nml=forcing_nml,iostat=nml_error)
-         if (nml_error /= 0) exit
       end do
-      if (nml_error == 0) close(nu_nml)
       if (nml_error /= 0) then
          write(ice_stdout,*) 'error reading namelist'
          call icedrv_system_abort(file=__FILE__,line=__LINE__)
       endif
       close(nu_nml)
-      
+
+      open (nu_nml, file=nml_filename, status='old',iostat=nml_error)
+      nml_error =  1
+      print*,'Reading grid_nml'
+      do while (nml_error > 0)
+         read(nu_nml, nml=grid_nml,iostat=nml_error)
+      end do
+      if (nml_error /= 0) then
+         write(ice_stdout,*) 'error reading namelist'
+         call icedrv_system_abort(file=__FILE__,line=__LINE__)
+      endif
+      close(nu_nml)
+
+      open (nu_nml, file=nml_filename, status='old',iostat=nml_error)
+      nml_error =  1
+      print*,'Reading tracer_nml'
+      do while (nml_error > 0)
+         read(nu_nml, nml=tracer_nml,iostat=nml_error)
+      end do
+      if (nml_error /= 0) then
+         write(ice_stdout,*) 'error reading namelist'
+         call icedrv_system_abort(file=__FILE__,line=__LINE__)
+      endif
+      close(nu_nml)
+
+      open (nu_nml, file=nml_filename, status='old',iostat=nml_error)
+      nml_error =  1
+      print*,'Reading thermo_nml'
+      do while (nml_error > 0)
+         read(nu_nml, nml=thermo_nml,iostat=nml_error)
+      end do
+      if (nml_error /= 0) then
+         write(ice_stdout,*) 'error reading namelist'
+         call icedrv_system_abort(file=__FILE__,line=__LINE__)
+      endif
+      close(nu_nml)
+
+      open (nu_nml, file=nml_filename, status='old',iostat=nml_error)
+      nml_error =  1
+      print*,'Reading shortwave_nml'
+      do while (nml_error > 0)
+         read(nu_nml, nml=shortwave_nml,iostat=nml_error)
+      end do
+      if (nml_error /= 0) then
+         write(ice_stdout,*) 'error reading namelist'
+         call icedrv_system_abort(file=__FILE__,line=__LINE__)
+      endif
+      close(nu_nml)
+
+      open (nu_nml, file=nml_filename, status='old',iostat=nml_error)
+      nml_error =  1
+      print*,'Reading ponds_nml'
+      do while (nml_error > 0)
+         read(nu_nml, nml=ponds_nml,iostat=nml_error)
+      end do
+      if (nml_error /= 0) then
+         write(ice_stdout,*) 'error reading namelist'
+         call icedrv_system_abort(file=__FILE__,line=__LINE__)
+      endif
+      close(nu_nml)
+
+      if (tr_snow) then
+         open (nu_nml, file=nml_filename, status='old',iostat=nml_error)
+         nml_error =  1
+         print*,'Reading snow_nml'
+         do while (nml_error > 0)
+            read(nu_nml, nml=snow_nml,iostat=nml_error)
+         end do
+         if (nml_error /= 0) then
+            write(ice_stdout,*) 'error reading namelist'
+            call icedrv_system_abort(file=__FILE__,line=__LINE__)
+         endif
+         close(nu_nml)
+      endif
+
+      open (nu_nml, file=nml_filename, status='old',iostat=nml_error)
+      nml_error =  1
+      print*,'Reading forcing_nml'
+      do while (nml_error > 0)
+         read(nu_nml, nml=forcing_nml,iostat=nml_error)
+      end do
+      if (nml_error /= 0) then
+         write(ice_stdout,*) 'error reading namelist'
+         call icedrv_system_abort(file=__FILE__,line=__LINE__)
+      endif
+      close(nu_nml)
+
       !-----------------------------------------------------------------
       ! set up diagnostics output and resolve conflicts
       !-----------------------------------------------------------------
@@ -558,6 +616,7 @@
                                trim(restart_dir)
          write(nu_diag,*)    ' restart_file              = ', &
                                trim(restart_file)
+         write(nu_diag,1010) ' history_cdf               = ', history_cdf
          write(nu_diag,*)    ' ice_ic                    = ', &
                                trim(ice_ic)
          write(nu_diag,1010) ' conserv_check             = ', conserv_check
