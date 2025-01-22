@@ -475,7 +475,7 @@
                nd = donor(n)
 
                if (daice(n) < c0) then
-                  if (daice(n) > -puny*aicen(nd)) then
+                  if (daice(n) > -puny) then
                      daice(n) = c0 ! shift no ice
                      dvice(n) = c0
                   else
@@ -484,7 +484,7 @@
                endif
 
                if (dvice(n) < c0) then
-                  if (dvice(n) > -puny*vicen(nd)) then
+                  if (dvice(n) > -puny) then
                      daice(n) = c0 ! shift no ice
                      dvice(n) = c0
                   else
@@ -493,7 +493,7 @@
                endif
 
                if (daice(n) > aicen(nd)*(c1-puny)) then
-                  if (daice(n) < aicen(nd)*(c1+puny)) then
+                  if (daice(n) < aicen(nd)+puny) then
                      daice(n) = aicen(nd)
                      dvice(n) = vicen(nd)
                   else
@@ -502,7 +502,7 @@
                endif
 
                if (dvice(n) > vicen(nd)*(c1-puny)) then
-                  if (dvice(n) < vicen(nd)*(c1+puny)) then
+                  if (dvice(n) < vicen(nd)+puny) then
                      daice(n) = aicen(nd)
                      dvice(n) = vicen(nd)
                   else
